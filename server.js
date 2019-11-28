@@ -9,7 +9,8 @@ const server = new Hapi.Server({
   routes: {
     files: {
       relativeTo: Path.join(__dirname, 'public')
-    }
+    },
+    cors: true
   }
 });
 

@@ -5,10 +5,14 @@ let classifier;
 let img;
 
 // this would eventually come from the camera
-const imagePath = './images/mmur4.jpg';
+const imagePath = './images/mmur/m7.png';
+
+// path to model
+const modelBasePath = 'https://teachablemachine.withgoogle.com/models/i4vUf-o5/';
+const modelJsonPath = modelBasePath + 'model.json';
 
 function preload() {
-  classifier = ml5.imageClassifier('MobileNet');
+  classifier = ml5.imageClassifier(modelJsonPath);
   img = loadImage(imagePath);
 }
 
