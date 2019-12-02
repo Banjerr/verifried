@@ -18,18 +18,18 @@ const server = new Hapi.Server({
 
 const doSomeOCR = function doSomeOCRFn(file) {
   if (!file) {
-      file = __dirname + '/public/images/mmur/m7.png';
+    // file = __dirname + '/public/images/mmur/m7.png';
+console.log('put error here, NO FILE');
   }
 
-  Tesseract.recognize(file)
-    .progress(function (p) { 
-console.log('progress', p) 
-    })
-    .catch(err => console.error(err))
-    .then(function (result) {
-console.log(result.text)
-      process.exit(0)
-    });
+  return new Promise((res, rej) => {
+    Tesseract.recognize(file)
+      .progress(function (p) {
+console.log('progress', p)
+      })
+      .catch(err => rej(err))
+      .then(resp => res(resp));
+  });
 };
 
 const provision = async () => {
@@ -37,26 +37,6 @@ const provision = async () => {
   await server.register(Inert);
 
   server.route(
-    // {
-    //   method: 'GET',
-    //   path: '/home/{param*}',
-    //   handler: {
-    //     directory: {
-    //       path: '.',
-    //       redirectToSlash: true,
-    //       index: true,
-    //     }
-    //   }
-    // },
-    // {
-    //   method: 'GET',
-    //   path: '/view/{file*}',
-    //   handler: {
-    //     directory: {
-    //       path: 'upload'
-    //     }
-    //   }
-    // },
     {
       path: '/upload',
       method: 'POST',
@@ -66,11 +46,23 @@ const provision = async () => {
           parse: true
         },
         handler: async (req, h) => {
-console.log(req.payload);
+          const file = req.payload.file;
+          const chunks = [];
 
-          doSomeOCR();
+          return new Promise((res, rej) => {
+            file.on('data', function (chunk) {
+              chunks.push(chunk);
+            });
 
-          return h.response('req.payload');
+            file.on('end', function () {
+              const fileBuffer = Buffer.concat(chunks);
+
+              doSomeOCR(fileBuffer).then(data => {
+console.log('DATA IS ', data.text);
+                res(data.text);
+              });
+            });
+          });
         }
       }     
     }
