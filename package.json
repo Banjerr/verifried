@@ -11,6 +11,7 @@
   "dependencies": {
     "@hapi/hapi": "^18.4.0",
     "@hapi/inert": "^5.2.2",
+    "@tensorflow/tfjs-node": "^1.3.2",
     "tesseract.js": "^1.0.19"
   }
 }
